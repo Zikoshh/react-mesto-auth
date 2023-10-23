@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 function PopupWithForm({
   title,
   name,
@@ -10,9 +12,32 @@ function PopupWithForm({
   submitButtonAriaLabel,
   children,
 }) {
+  const popupRef = useRef();
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscClose);
+    } else {
+      document.removeEventListener("keydown", handleEscClose);
+    }
+  }, [ isOpen ])
+
+  function handleEscClose(e) {
+    if (e.key === 'Escape') {
+      onClose();
+    }
+  }
+
+  function handleOverlayClose(e) {
+    if (e.target === popupRef.current) {
+      onClose();
+    }
+  }
   return (
     <section
+      ref={popupRef}
       className={`popup popup_type_${name} ${isOpen ? "popup_opened" : ""}`}
+      onMouseDown={handleOverlayClose}
     >
       <div className="popup__container">
         <button

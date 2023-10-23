@@ -10,7 +10,10 @@ function Card({ card, onCardClick, onCardLike, onCardDeleteClick }) {
   }`;
 
   function handleClick() {
-    onCardClick(card);
+    onCardClick({
+      name: card.name,
+      link: card.link
+    });
   }
 
   function handleLikeClick() {

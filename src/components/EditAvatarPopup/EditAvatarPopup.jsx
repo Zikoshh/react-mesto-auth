@@ -6,7 +6,7 @@ function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar, isLoading }) {
 
   useEffect(() => {
     avatarRef.current.value = "";
-  }, [isOpen])
+  }, [isOpen]);
 
   function handleSubmit(e) {
     e.preventDefault();

@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import Footer from "../Footer/index.jsx";
 import CurrentUserContext from "../../contexts/CurrentUserContext.jsx";
 import Card from "../Card/index.jsx";
 
@@ -56,6 +57,7 @@ function Main({
           />
         ))}
       </section>
+      <Footer />
     </main>
   );
 }

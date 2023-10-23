@@ -1,9 +1,35 @@
+import { useEffect, useRef } from "react";
+
 function ImagePopup({ card, onClose }) {
+  const popupRef = useRef();
+
+  useEffect(() => {
+    if (card) {
+      document.addEventListener("keydown", handleEscClose);
+    } else {
+      document.removeEventListener("keydown", handleEscClose);
+    }
+  }, [ card ])
+
+  function handleOverlayClose(e) {
+    if (e.target === popupRef.current) {
+      onClose();
+    }
+  }
+
+  function handleEscClose(e) {
+    if (e.key === 'Escape') {
+      onClose();
+    }
+  }
+
   return (
     <section
+    ref={popupRef}
       className={`popup popup_type_full-image ${
         card ? "popup_opened_image" : ""
       }`}
+      onMouseDown={handleOverlayClose}
     >
       <div className="popup__container">
         <button
