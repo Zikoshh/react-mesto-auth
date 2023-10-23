@@ -15,20 +15,20 @@ function PopupWithForm({
   const popupRef = useRef();
 
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscClose);
-    } else {
-      document.removeEventListener("keydown", handleEscClose);
+    if (!isOpen) return;
+
+    function closeByEsc(e) {
+      if (e.key === "Escape") {
+        onClose();
+      }
     }
+
+    document.addEventListener("keydown", closeByEsc);
+
+    return () => document.removeEventListener("keydown", closeByEsc);
   }, [isOpen]);
 
-  function handleEscClose(e) {
-    if (e.key === "Escape") {
-      onClose();
-    }
-  }
-
-  function handleOverlayClose(e) {
+  function closeByOverlay(e) {
     if (e.target === popupRef.current) {
       onClose();
     }
@@ -37,7 +37,7 @@ function PopupWithForm({
     <section
       ref={popupRef}
       className={`popup popup_type_${name} ${isOpen ? "popup_opened" : ""}`}
-      onMouseDown={handleOverlayClose}
+      onMouseDown={closeByOverlay}
     >
       <div className="popup__container">
         <button

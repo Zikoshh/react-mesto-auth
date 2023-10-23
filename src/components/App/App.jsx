@@ -18,7 +18,7 @@ import successfullyIcon from "../../image/successfully-icon.svg";
 import unSuccessfullyIcon from "../../image/unsuccessful-icon.svg";
 
 function App() {
-  const loggedInFromLocalStorage = JSON.parse(localStorage.getItem("loggedIn"));
+  const jwt = localStorage.getItem("jwt");
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
@@ -31,11 +31,12 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccesfully, setIsSuccesfully] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(loggedInFromLocalStorage);
+  const [isLoggedIn, setIsLoggedIn] = useState(jwt ? true : false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
 
   useEffect(() => {
-    Promise.all([api.getUserInfo(), api.getInitialCards()])
+    if (isLoggedIn) {
+      Promise.all([api.getUserInfo(), api.getInitialCards()])
       .then(([userInfo, cards]) => {
         setCurrentUser(userInfo);
         setCards(cards);
@@ -43,7 +44,8 @@ function App() {
       .catch((err) => {
         console.error(err);
       });
-  }, []);
+    }
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const jwt = localStorage.getItem("jwt");
@@ -53,7 +55,7 @@ function App() {
     }
 
     if (isLoggedIn) navigate("/");
-  }, [isLoggedIn]);
+  }, []);
 
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
@@ -172,8 +174,9 @@ function App() {
       .signIn(enteredData)
       .then((res) => {
         localStorage.setItem("jwt", res.token);
-        localStorage.setItem("loggedIn", true);
         setIsLoggedIn(true);
+        auth(res.token);
+        navigate("/", { replace: true })
       })
       .catch((err) => {
         console.error(err);

@@ -4,21 +4,21 @@ function ImagePopup({ card, onClose }) {
   const popupRef = useRef();
 
   useEffect(() => {
-    if (card) {
-      document.addEventListener("keydown", handleEscClose);
-    } else {
-      document.removeEventListener("keydown", handleEscClose);
+    if (!card) return;
+
+    function closeByEsc(e) {
+      if (e.key === "Escape") {
+        onClose();
+      }
     }
+
+    document.addEventListener("keydown", closeByEsc);
+
+    return () => document.removeEventListener("keydown", closeByEsc);
   }, [card]);
 
-  function handleOverlayClose(e) {
+  function closeByOverlay(e) {
     if (e.target === popupRef.current) {
-      onClose();
-    }
-  }
-
-  function handleEscClose(e) {
-    if (e.key === "Escape") {
       onClose();
     }
   }
@@ -29,7 +29,7 @@ function ImagePopup({ card, onClose }) {
       className={`popup popup_type_full-image ${
         card ? "popup_opened_image" : ""
       }`}
-      onMouseDown={handleOverlayClose}
+      onMouseDown={closeByOverlay}
     >
       <div className="popup__container">
         <button
