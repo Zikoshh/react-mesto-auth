@@ -12,7 +12,7 @@ function Card({ card, onCardClick, onCardLike, onCardDeleteClick }) {
   function handleClick() {
     onCardClick({
       name: card.name,
-      link: card.link
+      link: card.link,
     });
   }
 

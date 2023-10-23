@@ -9,7 +9,7 @@ function ImagePopup({ card, onClose }) {
     } else {
       document.removeEventListener("keydown", handleEscClose);
     }
-  }, [ card ])
+  }, [card]);
 
   function handleOverlayClose(e) {
     if (e.target === popupRef.current) {
@@ -18,14 +18,14 @@ function ImagePopup({ card, onClose }) {
   }
 
   function handleEscClose(e) {
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       onClose();
     }
   }
 
   return (
     <section
-    ref={popupRef}
+      ref={popupRef}
       className={`popup popup_type_full-image ${
         card ? "popup_opened_image" : ""
       }`}

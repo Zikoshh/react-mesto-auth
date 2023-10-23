@@ -20,10 +20,10 @@ function PopupWithForm({
     } else {
       document.removeEventListener("keydown", handleEscClose);
     }
-  }, [ isOpen ])
+  }, [isOpen]);
 
   function handleEscClose(e) {
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       onClose();
     }
   }
