@@ -18,7 +18,6 @@ import successfullyIcon from "../../image/successfully-icon.svg";
 import unSuccessfullyIcon from "../../image/unsuccessful-icon.svg";
 
 function App() {
-  const jwt = localStorage.getItem("jwt");
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
@@ -31,19 +30,19 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccesfully, setIsSuccesfully] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(jwt ? true : false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn) {
       Promise.all([api.getUserInfo(), api.getInitialCards()])
-      .then(([userInfo, cards]) => {
-        setCurrentUser(userInfo);
-        setCards(cards);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+        .then(([userInfo, cards]) => {
+          setCurrentUser(userInfo);
+          setCards(cards);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     }
   }, [isLoggedIn]);
 
@@ -53,8 +52,6 @@ function App() {
     if (jwt) {
       auth(jwt);
     }
-
-    if (isLoggedIn) navigate("/");
   }, []);
 
   function handleEditAvatarClick() {
@@ -176,7 +173,6 @@ function App() {
         localStorage.setItem("jwt", res.token);
         setIsLoggedIn(true);
         auth(res.token);
-        navigate("/", { replace: true })
       })
       .catch((err) => {
         console.error(err);
@@ -211,12 +207,13 @@ function App() {
     mestoAuth
       .tokenCheck(jwt)
       .then((res) => {
-        if (res) {
-          setUserEmail(res.data.email);
-        }
+        setUserEmail(res.data.email);
+        setIsLoggedIn(true);
+        navigate("/", { replace: true });
       })
       .catch((err) => {
         console.error(err);
+        setIsLoggedIn(false);
       });
   }
 

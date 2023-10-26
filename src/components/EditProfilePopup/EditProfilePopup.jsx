@@ -1,33 +1,29 @@
-import { useState, useContext, useEffect } from "react";
-import CurrentUserContext from "../../contexts/CurrentUserContext.jsx";
+import { useForm } from "react-hook-form";
 import PopupWithForm from "../PopupWithForm/index.jsx";
 
 function EditProfilePopup({ isOpen, onClose, onUpdateUser, isLoading }) {
-  const currentUser = useContext(CurrentUserContext);
+  const {
+    register,
+    handleSubmit,
+    clearErrors,
+    reset,
+    formState: { errors },
+  } = useForm({
+    mode: "onBlur",
+  });
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-
-  useEffect(() => {
-    setName(currentUser.name);
-    setDescription(currentUser.about);
-  }, [currentUser, isOpen]);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
+  function onSubmit(data) {
     onUpdateUser({
-      name: name,
-      about: description,
+      name: data.name,
+      about: data.about,
     });
+    reset();
   }
 
-  function handleNameChange(e) {
-    setName(e.target.value);
-  }
-
-  function handleDescriptionChange(e) {
-    setDescription(e.target.value);
+  function handleClose() {
+    onClose();
+    clearErrors();
+    reset();
   }
 
   return (
@@ -36,38 +32,45 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser, isLoading }) {
       name="profile-edit"
       submitButtonText="Сохранить"
       isOpen={isOpen}
-      onClose={onClose}
-      onSubmit={handleSubmit}
+      onClose={handleClose}
+      onSubmit={onSubmit}
+      formValidator={handleSubmit}
       isLoading={isLoading}
       loadingSubmitButtonText="Сохранение..."
       submitButtonAriaLabel="Кнопка обновления информации о пользователе"
     >
       <input
-        id="name"
-        className="popup__input popup__input_user-name"
+        className={`popup__input ${errors?.name && "popup__input_invalid"}`}
         name="name"
         type="text"
         placeholder="Введите имя"
-        minLength="2"
         maxLength="40"
-        required
-        value={name || ""}
-        onChange={handleNameChange}
+        minLength="2"
+        {...register("name", {
+          required: "Поле обязательно к заполнению",
+          minLength: { value: 2, message: "Минимальная длина для имени 2" },
+          maxLength: { value: 40, message: "Максимальная длина для имени 40" },
+        })}
       />
-      <p className="popup__error name-error"></p>
+      <p className={`popup__error ${errors?.name && "popup__error_active"}`}>
+        {errors?.name && (errors?.name?.message || "Error!")}
+      </p>
       <input
-        id="about"
-        className="popup__input popup__input_about-user"
+        className={`popup__input ${errors?.about && "popup__input_invalid"}`}
         name="about"
         type="text"
         placeholder="О себе"
-        minLength="2"
         maxLength="200"
-        required
-        value={description || ""}
-        onChange={handleDescriptionChange}
+        minLength="2"
+        {...register("about", {
+          required: "Поле обязательно к заполнению",
+          minLength: { value: 2, message: "Минимальная длина поля 2" },
+          maxLength: { value: 200, message: "Максимальная длина поля 200" },
+        })}
       />
-      <p className="popup__error about-error"></p>
+      <p className={`popup__error ${errors?.about && "popup__error_active"}`}>
+        {errors?.about && (errors?.about?.message || "Error!")}
+      </p>
     </PopupWithForm>
   );
 }

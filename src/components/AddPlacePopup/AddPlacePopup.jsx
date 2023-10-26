@@ -1,30 +1,29 @@
-import { useState, useEffect } from "react";
 import PopupWithForm from "../PopupWithForm/index.jsx";
+import { useForm } from "react-hook-form";
 
 function AddPlacePopup({ isOpen, onClose, onAddPlace, isLoading }) {
-  const [name, setName] = useState("");
-  const [link, setLink] = useState("");
+  const {
+    register,
+    handleSubmit,
+    clearErrors,
+    reset,
+    formState: { errors },
+  } = useForm({
+    mode: "onBlur",
+  });
 
-  useEffect(() => {
-    setName("");
-    setLink("");
-  }, [isOpen]);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
+  function onSubmit(data) {
     onAddPlace({
-      name: name,
-      link: link,
+      name: data.name,
+      link: data.link,
     });
+    reset();
   }
 
-  function handleNameChange(e) {
-    setName(e.target.value);
-  }
-
-  function handleLinkChange(e) {
-    setLink(e.target.value);
+  function handleClose() {
+    onClose();
+    clearErrors();
+    reset();
   }
 
   return (
@@ -33,36 +32,46 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace, isLoading }) {
       name="add-card"
       submitButtonText="Создать"
       isOpen={isOpen}
-      onClose={onClose}
-      onSubmit={handleSubmit}
+      onClose={handleClose}
+      onSubmit={onSubmit}
+      formValidator={handleSubmit}
       isLoading={isLoading}
       loadingSubmitButtonText="Создание..."
       submitButtonAriaLabel="Кнопка добавления карточки"
     >
       <input
-        id="placeName"
-        className="popup__input"
+        className={`popup__input ${errors?.name && "popup__input_invalid"}`}
         name="name"
         type="text"
         placeholder="Название"
-        minLength="2"
         maxLength="30"
-        required
-        value={name}
-        onChange={handleNameChange}
+        minLength="2"
+        {...register("name", {
+          required: "Поле обязательно к заполнению",
+          minLength: { value: 2, message: "Минимальная длина названия 2" },
+          maxLength: { value: 30, message: "Максимальная длина названия 30" },
+        })}
       ></input>
-      <p className="popup__error placeName-error"></p>
+      <p className={`popup__error ${errors?.name && "popup__error_active"}`}>
+        {errors?.name && (errors?.name?.message || "Error!")}
+      </p>
       <input
-        id="placeLink"
-        className="popup__input"
+        className={`popup__input ${errors?.link && "popup__input_invalid"}`}
         name="link"
-        type="url"
+        type="text"
         placeholder="Ссылка на картинку"
-        required
-        value={link}
-        onChange={handleLinkChange}
+        {...register("link", {
+          required: "Поле обязательно к заполнению",
+          pattern: {
+            value:
+              /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/,
+            message: "Некорректная ссылка",
+          },
+        })}
       ></input>
-      <p className="popup__error placeLink-error"></p>
+      <p className={`popup__error ${errors?.link && "popup__error_active"}`}>
+        {errors?.link && (errors?.link?.message || "Error!")}
+      </p>
     </PopupWithForm>
   );
 }

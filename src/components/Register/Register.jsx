@@ -1,53 +1,58 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 function Register({ onRegister }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    mode: "onBlur",
+  });
 
-  function handleEmailChange(e) {
-    setEmail(e.target.value);
-  }
-
-  function handlePasswordChange(e) {
-    setPassword(e.target.value);
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
+  function onSubmit(data) {
     onRegister({
-      password: password,
-      email: email,
+      password: data.password,
+      email: data.email,
     });
   }
 
   return (
     <div className="auth">
       <h2 className="auth__title">Регистрация</h2>
-      <form className="auth__form" onSubmit={handleSubmit}>
+      <form className="auth__form" onSubmit={handleSubmit(onSubmit)}>
         <input
-          id="1"
-          className="auth__input"
+          className={`auth__input ${errors?.email && "auth__input_invalid"}`}
           name="email"
-          type="email"
+          type="text"
           placeholder="Email"
-          required
-          value={email}
-          onChange={handleEmailChange}
+          {...register("email", {
+            required: "Поле обязательно к заполнению",
+            pattern: {
+              value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+              message: "Ваш email невалидный. Пример валидного email: email@mail.ru или email@gmail.com",
+            },
+          })}
         />
-        <p className="auth__error"></p>
+        <p className={`auth__error ${errors?.email && "auth__error_active"}`}>
+          {errors?.email && (errors?.email?.message || "Error!")}
+        </p>
         <input
-          id="2"
-          className="auth__input"
+          className={`auth__input ${errors?.password && "auth__input_invalid"}`}
           name="password"
-          type="password"
+          type="text"
           placeholder="Пароль"
-          required
-          value={password}
-          onChange={handlePasswordChange}
+          {...register("password", {
+            required: "Поле обязательно к заполнению",
+            pattern: {
+              value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/,
+              message: "Ваш пароль должен содержать минимум 8 символов, символы верхнего и нижнего регистров, а так же цифры.",
+            },
+          })}
         />
-        <p className="auth__error"></p>
+        <p className={`auth__error ${errors?.password && "auth__error_active"}`}>
+          {errors?.password && (errors?.password?.message || "Error!")}
+        </p>
         <button
           className="auth__submit-button"
           type="submit"

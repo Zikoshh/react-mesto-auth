@@ -7,6 +7,7 @@ function PopupWithForm({
   isOpen,
   onClose,
   onSubmit,
+  formValidator,
   isLoading,
   loadingSubmitButtonText,
   submitButtonAriaLabel,
@@ -51,7 +52,8 @@ function PopupWithForm({
           className={`popup__form popup__form_${name}`}
           action="#"
           name={name}
-          onSubmit={onSubmit}
+          onSubmit={formValidator ? formValidator(onSubmit) : onSubmit}
+          noValidate
         >
           {children}
           <button

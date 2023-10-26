@@ -26,7 +26,6 @@ function Login({ onLogin }) {
       <h2 className="auth__title">Вход</h2>
       <form className="auth__form" onSubmit={handleSubmit}>
         <input
-          id="3"
           className="auth__input"
           name="email"
           type="email"
@@ -35,9 +34,7 @@ function Login({ onLogin }) {
           value={email}
           onChange={handleEmailChange}
         />
-        <p className="auth__error"></p>
         <input
-          id="4"
           className="auth__input"
           name="password"
           type="password"
@@ -46,7 +43,6 @@ function Login({ onLogin }) {
           value={password}
           onChange={handlePasswordChange}
         />
-        <p className="auth__error"></p>
         <button
           className="auth__submit-button"
           type="submit"

@@ -1,19 +1,28 @@
-import { useRef, useEffect } from "react";
 import PopupWithForm from "../PopupWithForm/index.jsx";
+import { useForm } from "react-hook-form";
 
 function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar, isLoading }) {
-  const avatarRef = useRef("");
+  const {
+    register,
+    handleSubmit,
+    clearErrors,
+    reset,
+    formState: { errors },
+  } = useForm({
+    mode: "onBlur",
+  });
 
-  useEffect(() => {
-    avatarRef.current.value = "";
-  }, [isOpen]);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
+  function onSubmit(data) {
     onUpdateAvatar({
-      avatar: avatarRef.current.value,
+      avatar: data.link,
     });
+    reset();
+  }
+
+  function handleClose() {
+    onClose();
+    clearErrors();
+    reset();
   }
 
   return (
@@ -22,22 +31,30 @@ function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar, isLoading }) {
       name="edit-avatar"
       submitButtonText="Сохранить"
       isOpen={isOpen}
-      onClose={onClose}
-      onSubmit={handleSubmit}
+      onClose={handleClose}
+      onSubmit={onSubmit}
+      formValidator={handleSubmit}
       isLoading={isLoading}
       loadingSubmitButtonText="Сохранение..."
       submitButtonAriaLabel="Кнопка обновления карточки"
     >
       <input
-        id="placeAvatar"
-        className="popup__input"
+        className={`popup__input ${errors?.link && "popup__input_invalid"}`}
         name="link"
-        type="url"
+        type="text"
         placeholder="Ссылка на картинку"
-        required
-        ref={avatarRef}
+        {...register("link", {
+          required: "Поле обязательно к заполнению",
+          pattern: {
+            value:
+              /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/,
+            message: "Некорректная ссылка",
+          },
+        })}
       ></input>
-      <p className="popup__error placeAvatar-error"></p>
+      <p className={`popup__error ${errors?.link && "popup__error_active"}`}>
+        {errors?.link && (errors?.link?.message || "Error!")}
+      </p>
     </PopupWithForm>
   );
 }
